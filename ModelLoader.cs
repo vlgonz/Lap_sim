@@ -19,7 +19,7 @@ public class ModelLoader : MonoBehaviour
         "right iliac vein", "inferior cava vein", "bladder", "right kidney", "left kidney",
         "left ureter", "right ureter", "back", "left hip", "spinal cord and ribs",
         "sacrum", "right femur", "left femur", "right hip", "uterus and vagina",
-        "heart", "spleen", "liver", "central triad", "right triad", 
+        "heart", "spleen", "liver", "central triad", "right triad",
         "left triad"
     }; // Example array of desired names: REMOVE ANTERIOR SKIN FROM MODELS FOLDER
 
@@ -53,7 +53,7 @@ public class ModelLoader : MonoBehaviour
 
     {
 
-       // CheckOrganCollision();
+        // CheckOrganCollision();
     }
 
     // Function for loading all the models and the components and scripts attached to them.
@@ -362,7 +362,7 @@ public class ModelLoader : MonoBehaviour
         buttonRectTransform.anchorMax = new Vector2(0f, 1f);
         buttonRectTransform.pivot = new Vector2(0f, 1f);
         buttonRectTransform.anchoredPosition = Vector2.zero;
-        buttonRectTransform.sizeDelta = new Vector2(100f, 50f);
+        buttonRectTransform.sizeDelta = new Vector2(200f, 50f);
 
         // Add the Button component to the button GameObject
         Button buttonComponent = buttonObject.AddComponent<Button>();
@@ -372,10 +372,11 @@ public class ModelLoader : MonoBehaviour
         textObject.transform.SetParent(buttonObject.transform, false);
         RectTransform textRectTransform = textObject.AddComponent<RectTransform>();
         Text textComponent = textObject.AddComponent<Text>();
-        textComponent.text = "Hide";
+        textComponent.text = "Hide organs";
         textComponent.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        textComponent.fontStyle = FontStyle.Bold; // Set the font style to bold
         textComponent.alignment = TextAnchor.MiddleCenter;
-        textComponent.color = Color.black;
+        textComponent.color = Color.white;
 
         // Set the position and size of the text
         textRectTransform.anchorMin = Vector2.zero;
@@ -390,26 +391,13 @@ public class ModelLoader : MonoBehaviour
 
         // Add a yellow Image component to the button GameObject
         Image buttonImage = buttonObject.AddComponent<Image>();
-        buttonImage.color = Color.yellow;
+        buttonImage.color = new Color(0.12f, 0.44f, 0.93f); // Set the color to 0C6FEE (hex) or (12, 111, 238) (RGB)
 
         // Add an onClick event to the button to call the ToggleModels function
         buttonComponent.onClick.AddListener(ToggleModels);
 
-        // Add an event handler for PointerEnter to change button color to pink
-        EventTrigger eventTrigger = buttonObject.AddComponent<EventTrigger>();
-        EventTrigger.Entry pointerEnterEntry = new EventTrigger.Entry();
-        pointerEnterEntry.eventID = EventTriggerType.PointerEnter;
-        pointerEnterEntry.callback.AddListener((data) => { buttonImage.color = Color.magenta; });
-        eventTrigger.triggers.Add(pointerEnterEntry);
-
         // Assign the MainButton to the buttonObject
         mainButton = buttonObject;
-
-        // Add an event handler for PointerExit to restore the original button color
-        EventTrigger.Entry pointerExitEntry = new EventTrigger.Entry();
-        pointerExitEntry.eventID = EventTriggerType.PointerExit;
-        pointerExitEntry.callback.AddListener((data) => { buttonImage.color = Color.yellow; });
-        eventTrigger.triggers.Add(pointerExitEntry);
 
         // Set the parent of the button GameObject
         buttonObject.transform.SetParent(canvasObject.transform, false);
@@ -430,7 +418,7 @@ public class ModelLoader : MonoBehaviour
         {
             MeshRenderer meshRenderer = childTransform.GetComponent<MeshRenderer>();
             if (meshRenderer != null)
-            {   
+            {
                 string modelName = childTransform.name;
                 if (modelName.Contains("marker"))
                 {
@@ -462,16 +450,16 @@ public class ModelLoader : MonoBehaviour
 
         // Update the button text and color
         Text buttonText = mainButton.GetComponentInChildren<Text>();
-        buttonText.text = areModelsShown ? "Hide" : "Show";
+        buttonText.text = areModelsShown ? "Hide organs" : "Show organs";
 
         Image buttonImage = mainButton.GetComponent<Image>();
         if (areModelsShown)
         {
-            buttonImage.color = Color.yellow;
+            buttonImage.color = new Color(0.12f, 0.44f, 0.93f); // Set the color to 0C6FEE (hex) or (12, 111, 238) (RGB)
         }
         else
         {
-            buttonImage.color = Color.green;
+            buttonImage.color = new Color(0.96f, 0.18f, 0.27f); // Set the color to F62E46 (hex) or (246, 46, 70) (RGB)
         }
 
     }
