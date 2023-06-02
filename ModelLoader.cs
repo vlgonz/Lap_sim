@@ -14,14 +14,15 @@ public class ModelLoader : MonoBehaviour
 {
     public string modelsFolderPath; // The path to the models folder inside Resources folder
     private string[] desiredNames = {
-        "right iliac artery", "right iliac artery", "left iliac artery", "aorta and renal artery", "blood_vess_1",
-        "blood_vess_2", "left iliac artery", "pulmonary artery", "blood_vess_3", "left iliac vein",
-        "right iliac vein", "inferior cava vein", "bladder", "right kidney", "left kidney",
-        "left ureter", "right ureter", "back", "left hip", "spinal cord and ribs",
-        "sacrum", "right femur", "left femur", "right hip", "uterus and vagina",
-        "heart", "spleen", "liver", "central triad", "right triad",
-        "left triad"
-    }; // Example array of desired names: REMOVE ANTERIOR SKIN FROM MODELS FOLDER
+        "left iliac vein", "left iliac vein", "cava and right iliac vein", "cava and renal vein", "right gonadal vein",
+        "left gonadal vein", "cava and right iliac vein", "portal venous system", "right gonadal artery", "right iliac artery",
+        "aorta and left iliac artery", "celiac arterial trunk", "bladder", "right kidney", "left kidney",
+        "left ureter", "right ureter", "posterior back", "left iliac bone", "spinal cord and ribs",
+        "sacrum", "right femur", "left femur", "right iliac bone", "uterus and vagina",
+        "heart", "spleen", "liver", "urachus", "left umbilical ligament",
+        "right umbilical ligament"
+    }; // Example array of desired names: REMOVE ANTERIOR WALL FROM MODELS FOLDER
+
 
     public GameObject modelsParent; // Parent GameObject to hold the instantiated models
     public string cameraName;
@@ -42,7 +43,7 @@ public class ModelLoader : MonoBehaviour
         DisplayScreenInTwoHalves();
 
         // Call the method to create a tool tip
-        ToolTip();
+        //ToolTip();
 
         //Call the method to create main button for show or hide all organs
         MainButton();
@@ -53,7 +54,7 @@ public class ModelLoader : MonoBehaviour
 
     {
 
-        // CheckOrganCollision();
+        
     }
 
     // Function for loading all the models and the components and scripts attached to them.
@@ -148,6 +149,8 @@ public class ModelLoader : MonoBehaviour
         Material uterusMaterial = Resources.Load<Material>("Materials/uterus_vagina");
         Material bladderMaterial = Resources.Load<Material>("Materials/bladder");
         Material boneMaterial = Resources.Load<Material>("Materials/bone");
+        Material urachusMaterial = Resources.Load<Material>("Materials/urachus");
+        Material ligamentMaterial = Resources.Load<Material>("Materials/ligament");
 
         // Get all child objects of the models parent
         Transform[] modelTransforms = modelsParent.GetComponentsInChildren<Transform>();
@@ -157,14 +160,14 @@ public class ModelLoader : MonoBehaviour
         {
             string childName = childTransform.gameObject.name.ToLower();
 
-            if (childName.Contains("vein"))
+            if (childName.Contains("ve"))
             {
                 // Assign the vein material
                 MeshRenderer meshRenderer = childTransform.GetComponent<MeshRenderer>();
                 meshRenderer.material = veinMaterial;
 
             }
-            else if (childName.Contains("artery"))
+            else if (childName.Contains("arter"))
             {
                 // Assign the artery material
                 MeshRenderer meshRenderer = childTransform.GetComponent<MeshRenderer>();
@@ -205,11 +208,18 @@ public class ModelLoader : MonoBehaviour
                 meshRenderer.material = spleenMaterial;
 
             }
-            else if (childName.Contains("blood_vess"))
+            else if (childName.Contains("urachus"))
             {
                 // Assign the blood vessels material
                 MeshRenderer meshRenderer = childTransform.GetComponent<MeshRenderer>();
-                meshRenderer.material = bloodVesselsMaterial;
+                meshRenderer.material = urachusMaterial;
+
+            }
+            else if (childName.Contains("ligament"))
+            {
+                // Assign the blood vessels material
+                MeshRenderer meshRenderer = childTransform.GetComponent<MeshRenderer>();
+                meshRenderer.material = ligamentMaterial;
 
             }
             else if (childName.Contains("heart"))
@@ -233,7 +243,7 @@ public class ModelLoader : MonoBehaviour
                 meshRenderer.material = bladderMaterial;
 
             }
-            else if (childName.Contains("hip") || childName.Contains("femur") || childName.Contains("sacrum") || childName.Contains("cord"))
+            else if (childName.Contains("iliac") || childName.Contains("femur") || childName.Contains("sacrum") || childName.Contains("cord"))
             {
                 MeshRenderer meshRenderer = childTransform.GetComponent<MeshRenderer>();
                 meshRenderer.material = boneMaterial;
@@ -299,42 +309,42 @@ public class ModelLoader : MonoBehaviour
 
 
     // Function for creating the tool tip and assign it as child of Image marker. 
-    private void ToolTip()
-    {
+    //private void ToolTip()
+    //{
         // Create a parent GameObject if it doesn't exist
-        if (tipParent == null)
-        {
-            tipParent = new GameObject("ToolTipParent");
-        }
+        //if (tipParent == null)
+        //{
+            //tipParent = new GameObject("ToolTipParent");
+        //}
 
         // Create a sphere GameObject
-        GameObject tip = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        tip.name = "Tip";
+        //GameObject tip = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        //tip.name = "Tip";
         // Set the tag for collisions
-        tip.gameObject.tag = "Player";
-        tip.transform.localScale = Vector3.one * 10f;
+        //tip.gameObject.tag = "Player";
+        //tip.transform.localScale = Vector3.one * 10f;
 
         // Set the position of the tip GameObject
-        tip.transform.position = new Vector3(43.6f, 0f, 27.9f);
+        //tip.transform.position = new Vector3(12.2f, -35.2f, 27.9f);
 
         // Add Rigidbody component without gravity
-        Rigidbody rigidbody = tip.AddComponent<Rigidbody>();
-        rigidbody.useGravity = false;
+        //Rigidbody rigidbody = tip.AddComponent<Rigidbody>();
+        //rigidbody.useGravity = false;
 
 
         // Add SphereCollider component and set it as a trigger
-        SphereCollider sphereCollider = tip.GetComponent<SphereCollider>();
-        if (sphereCollider == null)
-        {
-            sphereCollider = tip.AddComponent<SphereCollider>();
-        }
+        //SphereCollider sphereCollider = tip.GetComponent<SphereCollider>();
+        //if (sphereCollider == null)
+        //{
+            //sphereCollider = tip.AddComponent<SphereCollider>();
+        //}
 
         // Check the isTrigger condition
-        sphereCollider.isTrigger = true;
+        //sphereCollider.isTrigger = true;
 
         // Set the parent of the sphere GameObject
-        tip.transform.SetParent(tipParent.transform);
-    }
+        //tip.transform.SetParent(tipParent.transform);
+    //}
 
     private void MainButton()
     {
