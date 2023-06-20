@@ -13,6 +13,9 @@ using UnityEngine.EventSystems;
 public class ModelLoader : MonoBehaviour
 {
     public string modelsFolderPath; // The path to the models folder inside Resources folder
+    public string SagittalModelsFolderPath; // The alternative path to the models folder
+    public string CoronalModelsFolderPath;
+    public GameObject coronalGameObject;
     private string[] desiredNames = {
         "left iliac vein", "left iliac vein", "cava and right iliac vein", "cava and renal vein", "right gonadal vein",
         "left gonadal vein", "cava and right iliac vein", "portal venous system", "right gonadal artery", "right iliac artery",
@@ -26,10 +29,11 @@ public class ModelLoader : MonoBehaviour
 
     public GameObject modelsParent; // Parent GameObject to hold the instantiated models
     public string cameraName;
-    public GameObject tipParent; // Parent GameObject to hold the instantiated tool tip
+    //public GameObject tipParent; // Parent GameObject to hold the instantiated tool tip
     // New variables for the button and its states
-    private GameObject mainButton;
-    private bool areModelsShown = true;
+    private GameObject changeViewButton;
+    // Reference to the "NEW CAMERA"
+    public Camera newCamera;
 
     private void Start()
 
@@ -37,24 +41,15 @@ public class ModelLoader : MonoBehaviour
         LoadModels();
 
         // Call the method to add the specific material for each model
-        AddMaterial();
+        //AddMaterial();
 
         // Call the method to display Unity screen in two halves
         DisplayScreenInTwoHalves();
-
-        // Call the method to create a tool tip
-        //ToolTip();
-
-        //Call the method to create main button for show or hide all organs
-        MainButton();
-
 
     }
     private void Update()
 
     {
-
-        
     }
 
     // Function for loading all the models and the components and scripts attached to them.
@@ -128,8 +123,12 @@ public class ModelLoader : MonoBehaviour
             else
             {
                 // Handle the case where there are more models than names in the array
-                instantiatedModel.name = "NewName" + i.ToString();
+                instantiatedModel.name = "ARSupportPiece" + i.ToString();
             }
+
+            // Add the "OrganCollision" script to the models. 
+            OrganCollision organCollision = instantiatedModel.gameObject.AddComponent<OrganCollision>();
+           
         }
     }
 
@@ -264,9 +263,11 @@ public class ModelLoader : MonoBehaviour
         return int.MaxValue; // Return a very large value if no number is found
     }
 
-    // Function for splitting the canvas screen in two halves.
+
+
     private void DisplayScreenInTwoHalves()
     {
+        
         // Create a Canvas GameObject
         GameObject canvasObject = new GameObject("Canvas");
         Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -304,175 +305,25 @@ public class ModelLoader : MonoBehaviour
 
         // Set the name of the external USB camera to connect
         cameraSelector.cameraName = cameraName;
+
+        // Create a RawImage GameObject for the "NEW CAMERA" as a child of the Canvas
+        GameObject newCameraRawImageObject = new GameObject("NewCameraRawImage");
+        newCameraRawImageObject.transform.SetParent(canvasObject.transform, false);
+        RawImage newCameraRawImage = newCameraRawImageObject.AddComponent<RawImage>();
+
+        // Set the RawImage dimensions to cover the right half of the screen
+        RectTransform newCameraRawImageRectTransform = newCameraRawImage.GetComponent<RectTransform>();
+        newCameraRawImageRectTransform.anchorMin = new Vector2(0f, 0f);
+        newCameraRawImageRectTransform.anchorMax = new Vector2(0.5f, 1f);
+        newCameraRawImageRectTransform.pivot = new Vector2(1f,1f);
+        newCameraRawImageRectTransform.offsetMin = Vector2.zero;
+        newCameraRawImageRectTransform.offsetMax = Vector2.zero;
+
+        // Set the "NEW CAMERA" target texture to the Raw Image
+        RenderTexture newCameraRenderTexture = new RenderTexture(Screen.width / 2, Screen.height, 0);
+        newCamera.targetTexture = newCameraRenderTexture;
+        newCameraRawImage.texture = newCameraRenderTexture;
     }
 
-
-
-    // Function for creating the tool tip and assign it as child of Image marker. 
-    //private void ToolTip()
-    //{
-        // Create a parent GameObject if it doesn't exist
-        //if (tipParent == null)
-        //{
-            //tipParent = new GameObject("ToolTipParent");
-        //}
-
-        // Create a sphere GameObject
-        //GameObject tip = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        //tip.name = "Tip";
-        // Set the tag for collisions
-        //tip.gameObject.tag = "Player";
-        //tip.transform.localScale = Vector3.one * 10f;
-
-        // Set the position of the tip GameObject
-        //tip.transform.position = new Vector3(12.2f, -35.2f, 27.9f);
-
-        // Add Rigidbody component without gravity
-        //Rigidbody rigidbody = tip.AddComponent<Rigidbody>();
-        //rigidbody.useGravity = false;
-
-
-        // Add SphereCollider component and set it as a trigger
-        //SphereCollider sphereCollider = tip.GetComponent<SphereCollider>();
-        //if (sphereCollider == null)
-        //{
-            //sphereCollider = tip.AddComponent<SphereCollider>();
-        //}
-
-        // Check the isTrigger condition
-        //sphereCollider.isTrigger = true;
-
-        // Set the parent of the sphere GameObject
-        //tip.transform.SetParent(tipParent.transform);
-    //}
-
-    private void MainButton()
-    {
-        // Create a Canvas GameObject
-        GameObject canvasObject = new GameObject("Canvas");
-        Canvas canvas = canvasObject.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvasObject.AddComponent<CanvasScaler>();
-        canvasObject.AddComponent<GraphicRaycaster>();
-
-        // Set the Canvas dimensions to cover the entire screen
-        RectTransform canvasRectTransform = canvas.GetComponent<RectTransform>();
-        canvasRectTransform.anchorMin = Vector2.zero;
-        canvasRectTransform.anchorMax = Vector2.one;
-        canvasRectTransform.offsetMin = Vector2.zero;
-        canvasRectTransform.offsetMax = Vector2.zero;
-
-        // Create a Button GameObject as a child of the Canvas
-        GameObject buttonObject = new GameObject("MainButton");
-        buttonObject.transform.SetParent(canvasObject.transform, false);
-        RectTransform buttonRectTransform = buttonObject.AddComponent<RectTransform>();
-
-        // Set the position and size of the button
-        buttonRectTransform.anchorMin = new Vector2(0f, 1f);
-        buttonRectTransform.anchorMax = new Vector2(0f, 1f);
-        buttonRectTransform.pivot = new Vector2(0f, 1f);
-        buttonRectTransform.anchoredPosition = Vector2.zero;
-        buttonRectTransform.sizeDelta = new Vector2(200f, 50f);
-
-        // Add the Button component to the button GameObject
-        Button buttonComponent = buttonObject.AddComponent<Button>();
-
-        // Add a Text component to the button GameObject and set its properties
-        GameObject textObject = new GameObject("Text");
-        textObject.transform.SetParent(buttonObject.transform, false);
-        RectTransform textRectTransform = textObject.AddComponent<RectTransform>();
-        Text textComponent = textObject.AddComponent<Text>();
-        textComponent.text = "Hide organs";
-        textComponent.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        textComponent.fontStyle = FontStyle.Bold; // Set the font style to bold
-        textComponent.alignment = TextAnchor.MiddleCenter;
-        textComponent.color = Color.white;
-
-        // Set the position and size of the text
-        textRectTransform.anchorMin = Vector2.zero;
-        textRectTransform.anchorMax = Vector2.one;
-        textRectTransform.pivot = new Vector2(0.5f, 0.5f);
-        textRectTransform.anchoredPosition = Vector2.zero;
-        textRectTransform.sizeDelta = Vector2.zero;
-
-        // Set the text font size based on the button size
-        float fontSize = buttonRectTransform.sizeDelta.y * 0.5f;
-        textComponent.fontSize = Mathf.FloorToInt(fontSize);
-
-        // Add a yellow Image component to the button GameObject
-        Image buttonImage = buttonObject.AddComponent<Image>();
-        buttonImage.color = new Color(0.12f, 0.44f, 0.93f); // Set the color to 0C6FEE (hex) or (12, 111, 238) (RGB)
-
-        // Add an onClick event to the button to call the ToggleModels function
-        buttonComponent.onClick.AddListener(ToggleModels);
-
-        // Assign the MainButton to the buttonObject
-        mainButton = buttonObject;
-
-        // Set the parent of the button GameObject
-        buttonObject.transform.SetParent(canvasObject.transform, false);
-    }
-
-
-    // Function for toggling the visibility of the models
-    private void ToggleModels()
-    {
-        // Toggle the visibility of the models
-        areModelsShown = !areModelsShown;
-
-        // Get all child objects of the models parent
-        Transform[] modelTransforms = modelsParent.GetComponentsInChildren<Transform>();
-
-        // Loop through each child object and toggle the MeshRenderer component
-        foreach (Transform childTransform in modelTransforms)
-        {
-            MeshRenderer meshRenderer = childTransform.GetComponent<MeshRenderer>();
-            if (meshRenderer != null)
-            {
-                string modelName = childTransform.name;
-                if (modelName.Contains("marker"))
-                {
-                    meshRenderer.enabled = true;
-                }
-                else
-                {   // If the organs are hidden
-                    if (areModelsShown == false)
-                    {
-                        meshRenderer.enabled = areModelsShown;
-
-                        // Add the "OrganCollision" script to the models. 
-                        OrganCollision organCollision = childTransform.gameObject.AddComponent<OrganCollision>();
-                    }
-                    else
-                    {   // If the organs are shown, disable the collider. 
-                        meshRenderer.enabled = areModelsShown;
-
-                        // Remove the "OrganCollision" script from the models if it exists
-                        OrganCollision organCollision = childTransform.gameObject.GetComponent<OrganCollision>();
-                        if (organCollision != null)
-                        {
-                            Destroy(organCollision);
-                        }
-                    }
-                }
-            }
-        }
-
-        // Update the button text and color
-        Text buttonText = mainButton.GetComponentInChildren<Text>();
-        buttonText.text = areModelsShown ? "Hide organs" : "Show organs";
-
-        Image buttonImage = mainButton.GetComponent<Image>();
-        if (areModelsShown)
-        {
-            buttonImage.color = new Color(0.12f, 0.44f, 0.93f); // Set the color to 0C6FEE (hex) or (12, 111, 238) (RGB)
-        }
-        else
-        {
-            buttonImage.color = new Color(0.96f, 0.18f, 0.27f); // Set the color to F62E46 (hex) or (246, 46, 70) (RGB)
-        }
-
-    }
 
 }
-
